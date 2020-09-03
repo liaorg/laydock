@@ -1,6 +1,15 @@
-LNMP一键安装程序
+DNMP（Docker + Nginx + MySQL + PHP7/5 + Redis）是一款全功能的LNMP一键安装程序。
 特点：
 1. 在 [**[DNMP]**](https://gitee.com/yeszao/dnmp) 的基础上删减和改进
+安装
+git
+docker
+docker-compose
+```bash
+curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+```
 2. 支持快速安装扩展命令 `install-php-extensions apcu`
 
 ## 1.目录结构
