@@ -1,0 +1,120 @@
+version: "3.8"
+services:
+  nginx:
+    build:
+      context: ./services/nginx
+      args:
+        NGINX_VERSION: ${NGINX_VERSION}
+        CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
+        NGINX_INSTALL_APPS: ${NGINX_INSTALL_APPS}
+    container_name: nginx
+    ports:
+      - "${NGINX_HTTP_HOST_PORT}:80"
+      - "${NGINX_HTTPS_HOST_PORT}:443"
+    volumes:
+      - ${SOURCE_DIR}:/www/:rw
+      - ${NGINX_SSL_CERTIFICATE_DIR}:/ssl:rw
+      - ${NGINX_CONFD_DIR}:/etc/nginx/conf.d/:rw
+      - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
+      - ${NGINX_FASTCGI_PHP_CONF}:/etc/nginx/fastcgi-php.conf:ro
+      - ${NGINX_FASTCGI_PARAMS}:/etc/nginx/fastcgi_params:ro
+      - ${NGINX_LOG_DIR}:/var/log/nginx/:rw
+    environment:
+      TZ: "$TZ"
+    restart: always
+    networks:
+      - default
+
+  php:
+    build:
+      context: ./services/php
+      args:
+        #PHP_VERSION: php:${PHP_VERSION}-cli-alpine
+        PHP_VERSION: php:${PHP_VERSION}-fpm-alpine
+        CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
+        PHP_EXTENSIONS: ${PHP_EXTENSIONS}
+        TZ: "${TZ}"
+    container_name: php
+    expose:
+      - 9000
+    ports:
+      - "9001-9030:9001-9030"
+    volumes:
+      - ${SOURCE_DIR}:/www/:rw
+      - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
+      - ${PHP_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
+      - ${PHP_LOG_DIR}:/var/log/php
+      - ${DATA_DIR}/composer:/tmp/composer
+    restart: always
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - default
+
+  mysql:
+    image: mysql:${MYSQL_VERSION}
+    container_name: mysql
+    ports:
+      - "${MYSQL_HOST_PORT}:3306"
+    volumes:
+      - ${MYSQL_CONFD_DIR}:/etc/mysql/conf.d/:rw
+      - ${MYSQL_CONF_FILE}:/etc/mysql/conf.d/mysql.cnf:rw
+      - ${MARIADB_LOG_DIR}:/var/log/mysql:rw
+      - ${DATA_DIR}/mysql:/var/lib/mysql/:rw
+    restart: always
+    networks:
+      - default
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      TZ: "${TZ}"
+
+#  mariadb:
+#    #image: alpinelinux/mariadb:latest
+#    image: mariadb:${MARIADB_VERSION}
+#    #build:
+#    #  context: ./services/mariadb
+#    #  args:
+#    #   MARIADB_VERSION: ${MARIADB_VERSION}
+#    #    CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
+#    #    TZ: "${TZ}"
+#    container_name: mariadb
+#    ports:
+#      - "${MARIADB_HOST_PORT}:3306"
+#    volumes:
+#      - ${MARIADB_CONFD_DIR}:/etc/mysql/conf.d/:rw
+#      - ${MARIADB_CONF_FILE}:/etc/mysql/my.cnf:rw
+#      - ${MARIADB_LOG_DIR}:/var/log/mysql/:rw
+#      - ${DATA_DIR}/mariadb:/data/:rw
+#    # restart: always
+#    networks:
+#      - default
+#    environment:
+#      MYSQL_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD}"
+#      # MYSQL_DATABASE: "${MARIADB_DATABASE}"
+#      # MYSQL_USER: "${MARIADB_USER}"
+#      # MYSQL_PASSWORD: "${MARIADB_PASSWORD}"
+#      TZ: "${TZ}"
+
+  redis:
+    image: redis:${REDIS_VERSION}
+    #build:
+    #  context: ./services/redis
+    #  args:
+    #    REDIS_VERSION: ${REDIS_VERSION}
+    #    CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
+    container_name: redis
+    ports:
+      - "${REDIS_HOST_PORT}:6379"
+    volumes:
+      - ${REDIS_CONF_FILE}:/etc/redis.conf:ro
+      - ${DATA_DIR}/redis:/data/:rw
+    restart: always
+    entrypoint: ["redis-server", "/etc/redis.conf"]
+    environment:
+      TZ: "${TZ}"
+    networks:
+      - default
+
+
+networks:
+  default:
