@@ -48,11 +48,12 @@ ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 ## 3.PHP和扩展
 ### 3.1 如果有改 nginx 配置
-    **重启 Nginx** 生效。
-    ```bash
-    $ docker exec -it nginx nginx -s reload
-    ```
-    这里两个`nginx`，第一个是容器名，第二个是容器中的`nginx`程序。
+
+**重启 Nginx** 生效
+```bash
+$ docker exec -it nginx nginx -s reload
+```
+这里两个`nginx`，第一个是容器名，第二个是容器中的`nginx`程序。
 
 ### 3.2 安装PHP扩展
 

@@ -36,13 +36,14 @@ services:
         TZ: "${TZ}"
     container_name: php
     expose:
-      - 9501
+      - "${PHP_FPM_PORT}"
     ports:
-      - "9501-9530:9501-9530"
+      - "${PHP_FPM_PORTS}"
     volumes:
       - ${SOURCE_DIR}:/www/:rw
       - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
       - ${PHP_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
+      - ${PHP_FPM_ZZ_DOCKER_CONF_FILE}:/usr/local/etc/php-fpm.d/zz-docker.conf:rw
       - ${PHP_LOG_DIR}:/var/log/php
       - ${DATA_DIR}/composer:/tmp/composer
     restart: always

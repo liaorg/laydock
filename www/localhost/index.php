@@ -2,23 +2,23 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-echo '<h1 style="text-align: center;">»¶Ó­Ê¹ÓÃDNMP£¡</h1>';
-echo '<h2>°æ±¾ĞÅÏ¢</h2>';
+echo '<h1 style="text-align: center;">æ¬¢è¿ä½¿ç”¨DNMPï¼</h1>';
+echo '<h2>ç‰ˆæœ¬ä¿¡æ¯</h2>';
 
 echo '<ul>';
-echo '<li>PHP°æ±¾£º', PHP_VERSION, '</li>';
-echo '<li>Nginx°æ±¾£º', $_SERVER['SERVER_SOFTWARE'], '</li>';
-echo '<li>MySQL·şÎñÆ÷°æ±¾£º', getMysqlVersion(), '</li>';
-echo '<li>Redis·şÎñÆ÷°æ±¾£º', getRedisVersion(), '</li>';
-echo '<li>MongoDB·şÎñÆ÷°æ±¾£º', getMongoVersion(), '</li>';
+echo '<li>PHPç‰ˆæœ¬ï¼š', PHP_VERSION, '</li>';
+echo '<li>Nginxç‰ˆæœ¬ï¼š', $_SERVER['SERVER_SOFTWARE'], '</li>';
+echo '<li>MySQLæœåŠ¡å™¨ç‰ˆæœ¬ï¼š', getMysqlVersion(), '</li>';
+echo '<li>RedisæœåŠ¡å™¨ç‰ˆæœ¬ï¼š', getRedisVersion(), '</li>';
+echo '<li>MongoDBæœåŠ¡å™¨ç‰ˆæœ¬ï¼š', getMongoVersion(), '</li>';
 echo '</ul>';
 
-echo '<h2>ÒÑ°²×°À©Õ¹</h2>';
+echo '<h2>å·²å®‰è£…æ‰©å±•</h2>';
 printExtensions();
 
 
 /**
- * »ñÈ¡MySQL°æ±¾
+ * è·å–MySQLç‰ˆæœ¬
  */
 function getMysqlVersion()
 {
@@ -32,13 +32,13 @@ function getMysqlVersion()
         }
         return $info['version'];
     } else {
-        return 'PDO_MYSQL À©Õ¹Î´°²×° ¡Á';
+        return 'PDO_MYSQL æ‰©å±•æœªå®‰è£… Ã—';
     }
 
 }
 
 /**
- * »ñÈ¡Redis°æ±¾
+ * è·å–Redisç‰ˆæœ¬
  */
 function getRedisVersion()
 {
@@ -52,12 +52,12 @@ function getRedisVersion()
             return $e->getMessage();
         }
     } else {
-        return 'Redis À©Õ¹Î´°²×° ¡Á';
+        return 'Redis æ‰©å±•æœªå®‰è£… Ã—';
     }
 }
 
 /**
- * »ñÈ¡MongoDB°æ±¾
+ * è·å–MongoDBç‰ˆæœ¬
  */
 function getMongoVersion()
 {
@@ -73,12 +73,12 @@ function getMongoVersion()
             return $e->getMessage();
         }
     } else {
-        return 'MongoDB À©Õ¹Î´°²×° ¡Á';
+        return 'MongoDB æ‰©å±•æœªå®‰è£… Ã—';
     }
 }
 
 /**
- * »ñÈ¡ÒÑ°²×°À©Õ¹ÁĞ±í
+ * è·å–å·²å®‰è£…æ‰©å±•åˆ—è¡¨
  */
 function printExtensions()
 {
