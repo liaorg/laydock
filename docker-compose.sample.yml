@@ -51,7 +51,31 @@ services:
       - SYS_PTRACE
     networks:
       - default
-
+  
+  nodejs:
+    build:
+      context: ./services/nodejs
+      args:
+        NODEJS_VERSION: ${NODEJS_VERSION}
+        NODEJS_PACKAGE_URL: ${NODEJS_PACKAGE_URL}
+    volumes:
+      - ${NODEJS_SOURCE_DIR}:/usr/local/app:rw
+    container_name: nodejs
+    expose:
+      - "${NODEJS_PORT}"
+    ports:
+      - "${NODEJS_PORT}:3000"
+    command: "npm start"
+    restart: always
+    environment:
+      TZ: "$TZ"
+    networks:
+      - default
+    #depends_on:
+    #  - redis
+    #links:
+    #  - redis:rd
+  
   mysql:
     image: mysql:${MYSQL_VERSION}
     container_name: mysql

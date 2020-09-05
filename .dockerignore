@@ -2,3 +2,5 @@ logs/
 data/
 www/
 services/nginx/ssl/
+node_modules
+npm-debug.log

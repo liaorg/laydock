@@ -1,0 +1,10 @@
+{
+  "name": "layapp",
+  "version": "0.0.1",
+  "private": true,
+  "description": "layapp",
+  "license": "MIT",
+  "scripts": {
+    "start": "node ./index.js"
+  }
+}
