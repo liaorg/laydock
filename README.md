@@ -189,7 +189,7 @@ docker push #推送（需登录）
 
 然后，打开`~/.bashrc`或者`~/.zshrc`文件，加上：
 ```bash
-source ./alias.sh
+source $HOME/alias.sh
 # 其内容为如下：
 alias dnginx='docker exec -it nginx /bin/sh'
 alias dmysql='docker exec -it mysql /bin/bash'
