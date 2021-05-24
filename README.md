@@ -146,6 +146,10 @@ $ docker-compose down --volumes             # 停止并删除容器，网络，�
 # 镜像导出
 $ docker save -o laydock.tar nginx:1.17.10-alpine redis:6.0.3-alpine mysql:5.7.30 php:7.4.6-fpm-alpine laydock_nginx:latest laydock_php:latest
 
+# 重启容器
+$ docker restart php
+$ docker-compose restart php
+
 ```
 
 ### 4.2 添加快捷命令
