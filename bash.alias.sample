@@ -14,7 +14,8 @@ php () {
         --rm \
         --volume $PWD:/www:rw \
         --workdir /www \
-        dnmp_php php "$@"
+        laydock_phpfpm php "$@"
+        # laydock_phpcli php "$@"
 }
 
 # php7 composer
@@ -29,5 +30,6 @@ composer () {
         --volume /var/laydock/data/composer:/tmp/composer \
         --volume $(pwd):/app \
         --workdir /app \
-        dnmp_php composer "$@"
+        laydock_phpfpm composer "$@"
+        # laydock_phpcli composer "$@"
 }

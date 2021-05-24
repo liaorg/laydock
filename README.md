@@ -189,12 +189,14 @@ docker push #推送（需登录）
 
 然后，打开`~/.bashrc`或者`~/.zshrc`文件，加上：
 ```bash
+source ./alias.sh
+# 其内容为如下：
 alias dnginx='docker exec -it nginx /bin/sh'
-alias dphp='docker exec -it php /bin/sh'
-alias dphp56='docker exec -it php56 /bin/sh'
-alias dphp54='docker exec -it php54 /bin/sh'
 alias dmysql='docker exec -it mysql /bin/bash'
 alias dredis='docker exec -it redis /bin/sh'
+
+alias dphpcli='docker exec -it php-cli /bin/sh'
+alias dphp='docker exec -it php-fpm /bin/sh'
 ```
 下次进入容器就非常快捷了，如进入php容器：
 ```bash
