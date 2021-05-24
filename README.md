@@ -1,5 +1,6 @@
-DNMP（Docker + Nginx + MySQL + PHP7/5 + Redis）是一款全功能的LNMP一键安装程序。
+DNMPR（Docker + Nginx + MySQL + PHP7 + Redis）是一款全功能的LNMP一键安装程序。
 特点：
+
 1. 在 [**[DNMP]**](https://gitee.com/yeszao/dnmp) 的基础上删减和改进
 安装
 git
@@ -35,6 +36,7 @@ ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 ```
 
 ## 2.快速使用
+
 1. 拷贝并命名配置文件（Windows系统请用`copy`命令），启动：
     ```
     $ cd laydock                                        # 进入项目目录
@@ -89,6 +91,7 @@ install-php-extensions apcu
 **方法1：主机中使用composer命令**
 1. 确定composer缓存的路径。`~/laydock/data/composer`。
 2. 参考[bash.alias.sample](bash.alias.sample)示例文件，将对应 php composer 函数拷贝到主机的 `~/.bashrc`文件。
+   
     > 这里需要注意的是，示例文件中的`~/laydock/data/composer`目录需是第一步确定的目录。
 3. 让文件起效：
     ```bash
@@ -110,9 +113,9 @@ install-php-extensions apcu
             }
         }
     }
-
+    
     ```
-**方法二：容器内使用composer命令**
+    **方法二：容器内使用composer命令**
 
 还有另外一种方式，就是进入容器，再执行`composer`命令，以PHP7容器为例：
 ```bash
@@ -140,6 +143,7 @@ $ docker-compose build php                  # 构建或者重新构建服务
 $ docker-compose rm php                     # 删除并且停止php容器
 $ docker-compose down --volumes             # 停止并删除容器，网络，图像和挂载卷
 
+# 镜像导出
 $ docker save -o laydock.tar nginx:1.17.10-alpine redis:6.0.3-alpine mysql:5.7.30 php:7.4.6-fpm-alpine laydock_nginx:latest laydock_php:latest
 
 ```
@@ -151,6 +155,31 @@ $ docker save -o laydock.tar nginx:1.17.10-alpine redis:6.0.3-alpine mysql:5.7.3
 ```bash
 $ docker ps           # 查看所有运行中的容器
 $ docker ps -a        # 所有容器
+
+# docker 常用命令
+#镜像
+docker images #列出本地镜像
+docker rmi training/sinatra #删除（在删除镜像之前要先用 docker rm 删掉依赖于这个镜像的所有容器）
+docker run -t -i ubuntu:14.04 /bin/bash #
+docker commit -m "Added json gem" -a "Docker Newbee" 0b2616b0e5a8 ouruser/sinatra:v2 #更新镜像
+docker tag 5db5f8471261 ouruser/sinatra:devel #修改标签
+docker build ${dockerfile_dir} #Dockerfile 构建
+docker save -o ubuntu_14.04.tar ubuntu:14.04 #保存
+docker load --input ubuntu_14.04.tar #导入
+#容器
+docker ps #查看容器信息
+docker rm #删掉容器（-f 删除运行中）
+docker inspect #查看指定容器详细信息（可获取ip，pid等信息）
+docker logs insane_babbage #查看容器log
+docker port CONTAINER [PRIVATE_PORT[/PROTO]] #查看端口映射
+docker start|stop|restart insane_babbage #启动终止重启
+docker attach insane_babbage #进入后台运行的容器 -d（推荐nsenter）
+docker export 7691a814370e > ubuntu.tar #导出快照
+cat ubuntu.tar | sudo docker import - test/ubuntu:v1.0 #导入快照
+## docker hub 
+docker search #搜索镜像
+docker pull #下载
+docker push #推送（需登录）
 ```
 输出的`NAMES`那一列就是容器的名称，如果使用默认配置，那么名称就是`nginx`、`php`、`php56`、`mysql`等。
 
@@ -169,12 +198,13 @@ $ dphp
 ```
 
 ### 4.3 查看docker网络
+
 ```sh
 ifconfig docker0
 ```
 用于填写`extra_hosts`容器访问宿主机的`hosts`地址
 
-## 5.使用Log
+## 5. 使用Log
 
 Log文件生成的位置依赖于conf下各log配置的值。
 
@@ -221,4 +251,15 @@ log-error               = /var/lib/mysql/mysql.error.log
 ```
 以上是mysql.conf中的日志文件的配置。
 
+## 6. 构建 PHP-CLI 环境
+
+### 6.1 安装
+
+```shell
+$ cd laydock                                        # 进入项目目录
+$ cp env.sample .env                                # 复制环境变量文件
+$ cp docker-compose.cli.sample.yml docker-compose.cli.yml   # 复制 docker-compose 配置文件。默认启动3个服务：
+                                                    # PHP7、Redis和MySQL。
+$ docker-compose -f docker-compose.cli.yml up -d    # 启动
+```
 

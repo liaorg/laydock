@@ -1,18 +1,31 @@
 #!/bin/sh
+
+# set -x
+
 echo "*** 启动 ssh ***"
-service ssh start
+flag = `ps aux|grep "sshd"|grep -v "grep"|wc -l`
+if [ $flag == 0 ]
+    service ssh start
+fi
 service ssh status
 
 echo "================================"
 
 echo "*** 启动 docker ***"
-service docker start
+flag = `ps aux|grep "dockerd"|grep -v "grep"|wc -l`
+if [ $flag == 0 ]
+    service docker start
+fi
 
 echo "================================"
 
 echo "*** 启动应用 ***"
-docker-compose up -d
-
+if [ "$1" == "phpcli" ]; then
+    docker-compose -f docker-compose.cli.yml up -d
+else
+    docker-compose up -d
+fi
+    
 echo "================================"
 
 # 查看启动的容器

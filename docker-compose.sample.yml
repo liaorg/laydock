@@ -25,7 +25,7 @@ services:
     networks:
       - default
 
-  php:
+  phpfpm:
     build:
       context: ./services/php
       args:
@@ -34,7 +34,7 @@ services:
         CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
         PHP_EXTENSIONS: ${PHP_EXTENSIONS}
         TZ: "${TZ}"
-    container_name: php
+    container_name: php-fpm
     expose:
       - "${PHP_FPM_PORT}"
     ports:
@@ -51,7 +51,7 @@ services:
       - SYS_PTRACE
     networks:
       - default
-  
+ 
   nodejs:
     build:
       context: ./services/nodejs
@@ -84,7 +84,7 @@ services:
     volumes:
       - ${MYSQL_CONFD_DIR}:/etc/mysql/conf.d/:rw
       - ${MYSQL_CONF_FILE}:/etc/mysql/conf.d/mysql.cnf:rw
-      - ${MARIADB_LOG_DIR}:/var/log/mysql:rw
+      - ${MYSQL_LOG_DIR}:/var/log/mysql:rw
       - ${DATA_DIR}/mysql:/var/lib/mysql/:rw
     restart: always
     networks:
