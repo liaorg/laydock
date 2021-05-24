@@ -29,7 +29,7 @@ services:
     build:
       context: ./services/php
       args:
-        #PHP_VERSION: php:${PHP_VERSION}-cli-alpine
+        PHP_RUNING: fpm
         PHP_VERSION: php:${PHP_VERSION}-fpm-alpine
         CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
         PHP_EXTENSIONS: ${PHP_EXTENSIONS}
@@ -41,9 +41,10 @@ services:
       - "${PHP_FPM_PORTS}"
     volumes:
       - ${SOURCE_DIR}:/www/:rw
-      - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
+      - ${PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
       - ${PHP_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
       - ${PHP_FPM_ZZ_DOCKER_CONF_FILE}:/usr/local/etc/php-fpm.d/zz-docker.conf:rw
+      - ${PHP_CONFD_DIR}:/usr/local/etc/php/php-fpm.d/:rw
       - ${PHP_LOG_DIR}:/var/log/php
       - ${DATA_DIR}/composer:/tmp/composer
     restart: always

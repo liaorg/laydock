@@ -4,6 +4,7 @@ FROM ${PHP_VERSION}
 ARG TZ
 ARG PHP_EXTENSIONS
 ARG CONTAINER_PACKAGE_URL
+ARG PHP_RUNING
 
 
 RUN sed -i "s/dl-cdn.alpinelinux.org/${CONTAINER_PACKAGE_URL}/g" /etc/apk/repositories
@@ -11,6 +12,12 @@ RUN sed -i "s/dl-cdn.alpinelinux.org/${CONTAINER_PACKAGE_URL}/g" /etc/apk/reposi
 RUN apk update \
     && apk upgrade \
     && rm -rf /var/cache/apk/*
+
+COPY ./etc /tmp/etc
+WORKDIR /tmp/etc
+RUN chmod +x tuning.sh \
+    && sh tuning.sh \
+    && rm -rf /tmp/etc
 
 COPY ./extensions /tmp/extensions
 WORKDIR /tmp/extensions

@@ -31,4 +31,4 @@ fi
 echo "================================"
 
 # 查看启动的容器
-docker ps --format "table {{.ID}}\t{{.Names}}"
+docker ps --format "table {{.ID}}\t {{.Ports}}\t{{.Names}}"

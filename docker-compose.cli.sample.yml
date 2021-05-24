@@ -4,6 +4,7 @@ services:
     build:
       context: ./services/php
       args:
+        PHP_RUNING: cli
         PHP_VERSION: php:${PHP_VERSION}-cli-alpine
         CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
         PHP_EXTENSIONS: ${PHP_EXTENSIONS}
@@ -14,7 +15,9 @@ services:
       - "${PHP_CLI_SSL_HOST_PORT}:443"
     volumes:
       - ${SOURCE_DIR}:/www/:rw
-      - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
+      - ${PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
+      - ${PHP_CONFD_DIR}:/usr/local/etc/php/conf.d/:rw
+      - ${PHP_CLI_CONF_FILE}:/usr/local/etc/php/conf.d/php-cli.cnf:rw
       - ${PHP_CLI_LOG_DIR}:/var/log/php
       - ${DATA_DIR}/composer:/tmp/composer
     # restart: always

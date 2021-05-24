@@ -261,5 +261,6 @@ $ cp env.sample .env                                # 复制环境变量文件
 $ cp docker-compose.cli.sample.yml docker-compose.cli.yml   # 复制 docker-compose 配置文件。默认启动3个服务：
                                                     # PHP7、Redis和MySQL。
 $ docker-compose -f docker-compose.cli.yml up -d    # 启动
+$ docker exec -it php-cli /bin/sh
 ```
 
