@@ -11,10 +11,9 @@ if ($sapi != 'cli') {
     echo '<ul>';
     echo '<li>PHP版本：', PHP_VERSION, '</li>';
     echo '<li>PHP运行环境：', php_sapi_name(); '</li>';
-    echo '<li>Nginx版本：', $_SERVER['SERVER_SOFTWARE'], '</li>';
+    echo '<li>Nginx版本：1.19.10</li>';
     echo '<li>MySQL服务器版本：', getMysqlVersion(), '</li>';
     echo '<li>Redis服务器版本：', getRedisVersion(), '</li>';
-    echo '<li>MongoDB服务器版本：', getMongoVersion(), '</li>';
     echo '</ul>';
     
     echo '<h2>已安装扩展</h2>';

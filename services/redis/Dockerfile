@@ -10,13 +10,12 @@ RUN if [ "${CONTAINER_PACKAGE_URL}" != "" ]; then \
     fi
 
 USER root
-# disabled THP
-RUN  sudo echo never > /sys/kernel/mm/transparent_hugepage/enabled;
 
-# The TCP backlog setting
-RUN sudo echo 511 > /proc/sys/net/core/somaxconn;
-# 或者 打开ietc/sysctl.conf
-# 在这里面添net.core.somaxconn= 1024 然后执行sysctl -p
+COPY ./sysctl.d/* /etc/sysctl.d/
+
+# disabled THP
+RUN sudo echo never > /sys/kernel/mm/transparent_hugepage/enabled; \
+    sysctl -p;
 
 
 ENTRYPOINT ["redis-server", "/etc/redis.conf"]

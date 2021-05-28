@@ -26,6 +26,7 @@ services:
     networks:
       - default
     tty: true
+    command: php /www/webman/start.php start -d
 
   mysql:
     image: mysql:${MYSQL_VERSION}
