@@ -16,17 +16,16 @@ services:
     volumes:
       - ${SOURCE_DIR}:/www/:rw
       - ${PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
-      - ${PHP_CONFD_DIR}:/usr/local/etc/php/conf.d/:rw
       - ${PHP_CLI_CONF_FILE}:/usr/local/etc/php/conf.d/php-cli.cnf:rw
       - ${PHP_CLI_LOG_DIR}:/var/log/php
       - ${DATA_DIR}/composer:/tmp/composer
-    # restart: always
+    restart: always
     cap_add:
       - SYS_PTRACE
     networks:
       - default
-    tty: true
-    command: php /www/webman/start.php start -d
+    # tty: true
+    command: php /www/webman/start.php start
 
   mysql:
     image: mysql:${MYSQL_VERSION}
@@ -53,6 +52,9 @@ services:
     volumes:
       - ${REDIS_CONF_FILE}:/etc/redis.conf:ro
       - ${DATA_DIR}/redis:/data/:rw
+    sysctls:
+      - net.core.somaxconn=1024
+    #  - vm.overcommit_memory=1
     restart: always
     entrypoint: ["redis-server", "/etc/redis.conf"]
     environment:

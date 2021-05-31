@@ -134,6 +134,9 @@ services:
     volumes:
       - ${REDIS_CONF_FILE}:/etc/redis.conf:ro
       - ${DATA_DIR}/redis:/data/:rw
+    sysctls:
+      - net.core.somaxconn:1024
+    #  - vm.overcommit_memory:1
     restart: always
     entrypoint: ["redis-server", "/etc/redis.conf"]
     environment:

@@ -13,6 +13,7 @@ echo "Work directory            : ${PWD}"
 echo "============================================"
 echo
 
+sh /tmp/etc/tuning.sh
 
 if [ "${PHP_EXTENSIONS}" != "" ]; then
     apk --update add --no-cache --virtual .build-deps autoconf g++ libtool make curl-dev gettext-dev linux-headers
@@ -52,7 +53,7 @@ isPhpVersionGreaterOrEqual()
 # Install extension from package file(.tgz),
 # For example:
 #
-# installExtensionFromTgz redis-5.0.2
+# installExtensionFromTgz redis-5.2.2
 #
 # Param 1: Package name with version
 # Param 2: enable options
@@ -66,9 +67,6 @@ installExtensionFromTgz()
     tar -xf ${tgzName}.tgz -C ${extensionName} --strip-components=1
     ( cd ${extensionName} && phpize && ./configure && make ${MC} && make install )
 
-    if [[ "${extensionName}" = "sdebug" ]]; then
-        extensionName="xdebug"
-    fi
     docker-php-ext-enable ${extensionName} $2
 }
 
@@ -124,7 +122,9 @@ fi
 
 if [[ -z "${EXTENSIONS##*,gettext,*}" ]]; then
     echo "---------- Install gettext ----------"
-	docker-php-ext-install ${MC} gettext
+    apk --no-cache add gettext-dev
+    docker-php-ext-install ${MC} gettext
+
 fi
 
 if [[ -z "${EXTENSIONS##*,shmop,*}" ]]; then
@@ -157,13 +157,34 @@ if [[ -z "${EXTENSIONS##*,pdo_dblib,*}" ]]; then
 	docker-php-ext-install ${MC} pdo_dblib
 fi
 
+
 if [[ -z "${EXTENSIONS##*,pdo_oci,*}" ]]; then
     echo "---------- Install pdo_oci ----------"
+    apk --no-cache add libaio
+    apk --no-cache add libnsl
+    ln -s /usr/lib/libnsl.so.2.0.1 /usr/lib/libnsl.so.1
+    #export ORACLE_HOME=/usr/local/src/instantclient/client64
+    #export LD_LIBRARY_PATH=$ORACLE_HOME/lib
+    cd /usr/local/src/
+    mkdir -p /usr/local/src/instantclient
+    # cp -rf ./oracle_instantclient_11_2/* /usr/local/src/instantclient/
+    tar -zxvf /tmp/extensions/oracle_instantclient_11_2.tar.gz
+    # ls -al /usr/local/src/instantclient
+    ## 创建连接
+    cd /usr/local/src/instantclient/
+    ln -s libnnz11.so libnnz.so
+    ln -s libclntsh.so.11.1 libclntsh.so
+    ln -s libocci.so.11.1 libocci.so
+    #cp /usr/local/src/instantclient/libnnz11.so /usr/lib/
+    cd /tmp/extensions
+    docker-php-ext-configure pdo_oci --with-pdo-oci=instantclient,/usr/local/src/instantclient
 	docker-php-ext-install ${MC} pdo_oci
 fi
 
 if [[ -z "${EXTENSIONS##*,pdo_odbc,*}" ]]; then
     echo "---------- Install pdo_odbc ----------"
+    apk --no-cache add unixodbc-dev
+    docker-php-ext-configure pdo_odbc --with-pdo-odbc=unixODBC,/usr
 	docker-php-ext-install ${MC} pdo_odbc
 fi
 
@@ -181,6 +202,7 @@ fi
 
 if [[ -z "${EXTENSIONS##*,oci8,*}" ]]; then
     echo "---------- Install oci8 ----------"
+    docker-php-ext-configure oci8 --with-oci8=instantclient,/usr/local/src/instantclient
 	docker-php-ext-install ${MC} oci8
 fi
 
@@ -207,9 +229,9 @@ if [[ -z "${EXTENSIONS##*,gd,*}" ]]; then
     if [[ "$?" = "1" ]]; then
         # "--with-xxx-dir" was removed from php 7.4,
         # issue: https://github.com/docker-library/php/issues/912
-        options="--with-freetype --with-jpeg"
+        options="--with-freetype --with-jpeg --with-webp"
     else
-        options="--with-gd --with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/"
+        options="--with-gd --with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-webp-dir=/usr/include/"
     fi
 
     apk add --no-cache \
@@ -219,6 +241,7 @@ if [[ -z "${EXTENSIONS##*,gd,*}" ]]; then
         libpng-dev \
         libjpeg-turbo \
         libjpeg-turbo-dev \
+	    libwebp-dev \
     && docker-php-ext-configure gd ${options} \
     && docker-php-ext-install ${MC} gd \
     && apk del \
@@ -323,6 +346,12 @@ if [[ -z "${EXTENSIONS##*,ldap,*}" ]]; then
 	docker-php-ext-install ${MC} ldap
 fi
 
+if [[ -z "${EXTENSIONS##*,psr,*}" ]]; then
+    echo "---------- Install psr ----------"
+    printf "\n" | pecl install psr
+    docker-php-ext-enable psr
+fi
+
 if [[ -z "${EXTENSIONS##*,imagick,*}" ]]; then
     echo "---------- Install imagick ----------"
 	apk add --no-cache file-dev
@@ -356,6 +385,29 @@ if [[ -z "${EXTENSIONS##*,igbinary,*}" ]]; then
     docker-php-ext-enable igbinary
 fi
 
+
+if [[ -z "${EXTENSIONS##*,ssh2,*}" ]]; then
+    isPhpVersionGreaterOrEqual 7 0
+    if [[ "$?" = "1" ]]; then
+        echo "---------- Install ssh2 ----------"
+        printf "\n" | apk add libssh2-dev
+        pecl install ssh2-1.1.2
+        docker-php-ext-enable ssh2
+    else
+        echo "ssh2 requires PHP >= 7.0.0, installed version is ${PHP_VERSION}"
+    fi
+fi
+
+if [[ -z "${EXTENSIONS##*,protobuf,*}" ]]; then
+    isPhpVersionGreaterOrEqual 7 0
+    if [[ "$?" = "1" ]]; then
+        echo "---------- Install protobuf ----------"
+        printf "\n" | pecl install protobuf
+        docker-php-ext-enable protobuf
+    else
+        echo "yar requires PHP >= 7.0.0, installed version is ${PHP_VERSION}"
+    fi
+fi
 
 if [[ -z "${EXTENSIONS##*,yac,*}" ]]; then
     echo "---------- Install yac ----------"
@@ -410,6 +462,8 @@ if [[ -z "${EXTENSIONS##*,pdo_sqlsrv,*}" ]]; then
         apk add --no-cache unixodbc-dev
         printf "\n" | pecl install pdo_sqlsrv
         docker-php-ext-enable pdo_sqlsrv
+        curl -o /tmp/msodbcsql17_amd64.apk https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.5.2.1-1_amd64.apk
+        apk add --allow-untrusted /tmp/msodbcsql17_amd64.apk
     else
         echo "pdo_sqlsrv requires PHP >= 7.1.0, installed version is ${PHP_VERSION}"
     fi
@@ -568,10 +622,6 @@ if [[ -z "${EXTENSIONS##*,swoole,*}" ]]; then
     fi
 fi
 
-if [[ -z "${EXTENSIONS##*,sdebug,*}" ]]; then
-    echo "---------- Install sdebug ----------"
-    installExtensionFromTgz sdebug-2.9
-fi
 
 if [[ -z "${EXTENSIONS##*,zip,*}" ]]; then
     echo "---------- Install zip ----------"
@@ -611,6 +661,56 @@ if [[ -z "${EXTENSIONS##*,xlswriter,*}" ]]; then
         docker-php-ext-enable xlswriter
     else
         echo "---------- PHP Version>= 7.0----------"
+    fi
+fi
+
+if [[ -z "${EXTENSIONS##*,rdkafka,*}" ]]; then
+    echo "---------- Install rdkafka ----------"
+    isPhpVersionGreaterOrEqual 5 6
+
+    if [[ "$?" = "1" ]]; then
+        apk add librdkafka-dev
+        printf "\n" | pecl install rdkafka
+        docker-php-ext-enable rdkafka
+    else
+        echo "---------- PHP Version>= 5.6----------"
+    fi
+fi
+
+if [[ -z "${EXTENSIONS##*,zookeeper,*}" ]]; then
+    echo "---------- Install zookeeper ----------"
+    isPhpVersionGreaterOrEqual 7 0
+
+    if [[ "$?" = "1" ]]; then
+        apk add re2c
+        apk add libzookeeper-dev --repository http://${CONTAINER_PACKAGE_URL}/alpine/edge/testing/
+        printf "\n" | pecl install zookeeper
+        docker-php-ext-enable zookeeper
+    else
+        echo "---------- PHP Version>= 7.0----------"
+    fi
+fi
+
+if [[ -z "${EXTENSIONS##*,phalcon,*}" ]]; then
+    echo "---------- Install phalcon ----------"
+    isPhpVersionGreaterOrEqual 7 2
+
+    if [[ "$?" = "1" ]]; then
+        printf "\n" | pecl install phalcon
+        docker-php-ext-enable psr
+        docker-php-ext-enable phalcon
+    else
+        echo "---------- PHP Version>= 7.2----------"
+    fi
+fi
+
+if [[ -z "${EXTENSIONS##*,sdebug,*}" ]]; then
+    echo "---------- Install sdebug ----------"
+    isPhpVersionGreaterOrEqual 7 2
+    if [[ "$?" = "1" ]]; then
+       installExtensionFromTgz sdebug-2.9
+    else
+        echo "---------- PHP Version>= 7.2----------"
     fi
 fi
 

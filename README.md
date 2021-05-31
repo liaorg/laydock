@@ -150,6 +150,11 @@ $ docker save -o laydock.tar nginx:1.17.10-alpine redis:6.0.3-alpine mysql:5.7.3
 $ docker restart php
 $ docker-compose restart php
 
+# 压缩解压
+$ tar -zcvf oracle_instantclient_11_2.tar.gz oracle_instantclient_11_2
+$ cd /usr/local/src/
+$ tar -zxvf /tmp/extensions/oracle_instantclient_11_2.tar.gz
+
 ```
 
 ### 4.2 添加快捷命令
@@ -268,5 +273,6 @@ $ cp docker-compose.cli.sample.yml docker-compose.cli.yml   # 复制 docker-comp
                                                     # PHP7、Redis和MySQL。
 $ docker-compose -f docker-compose.cli.yml up -d    # 启动
 $ docker exec -it php-cli /bin/sh
+$ dphpcli
 ```
 
